@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-registration-backend
+  labels:
+    app: user-registration-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-registration-backend
+  template:
+    metadata:
+      labels:
+        app: user-registration-backend
+    spec:
+      containers:
+        - name: user-registration-backend
+          image: marlonmilesmg/user-registration-backend:latest
+          ports:
+            - containerPort: 8080
