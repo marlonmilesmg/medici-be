@@ -24,6 +24,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new UserCreationException("Username '" + user.getUsername() + "' is already taken.");
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserCreationException("Email '" + user.getEmail() + "' is already registered.");
+        }
+
+
         try {
             return userRepository.save(user);
         } catch (Exception ex) {
