@@ -52,19 +52,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, User updatedUser) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    user.setUsername(updatedUser.getUsername());
-                    user.setEmail(updatedUser.getEmail());
-                    user.setPassword(updatedUser.getPassword());
-                    try {
-                        return userRepository.save(user);
-                    } catch (Exception ex) {
-                        throw new UserUpdateException("Failed to update user.", ex);
-                    }
-                })
-                .orElseThrow(() -> new UserUpdateException("User not found for update."));
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserUpdateException("User with ID " + id + " not found."));
+
+        if (!existingUser.getUsername().equals(updatedUser.getUsername()) &&
+                userRepository.existsByUsername(updatedUser.getUsername())) {
+            throw new UserUpdateException("Username '" + updatedUser.getUsername() + "' is already taken.");
+        }
+
+        if (!existingUser.getEmail().equals(updatedUser.getEmail()) &&
+                userRepository.existsByEmail(updatedUser.getEmail())) {
+            throw new UserUpdateException("Email '" + updatedUser.getEmail() + "' is already registered.");
+        }
+
+        existingUser.setUsername(updatedUser.getUsername());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPassword(updatedUser.getPassword());
+
+        try {
+            return userRepository.save(existingUser);
+        } catch (Exception ex) {
+            throw new UserUpdateException("Failed to update user.", ex);
+        }
     }
+
 
     @Override
     public void deleteUser(Long id) {
