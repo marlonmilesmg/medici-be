@@ -17,5 +17,6 @@ spec:
       containers:
         - name: user-registration-backend
           image: marlonmilesmg/user-registration-backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
